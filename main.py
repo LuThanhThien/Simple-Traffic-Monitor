@@ -23,9 +23,8 @@ def parse_opt():
     parser.add_argument('--weights', type=str, default=WEIGHTS_PATH, help='Path to the object detection model')
     parser.add_argument('--classes', type=list_of_strings, default=None, help='Classes for detection')
     parser.add_argument('--path', type=str, default='src//assets/videos//car-0.mp4', help='Path to the video')
-    parser.add_argument('--stream', type=bool, default=False, help='Whether to stream from Youtube or not')
-    parser.add_argument('--url', type=str, default='https://www.youtube.com/watch?v=vpZBZnolf1U&t=348s', 
-                        help='URL of the streaming Youtube video')
+    parser.add_argument('--stream', action='store_true', help='Whether to stream from Youtube or not')
+    parser.add_argument('--url', type=str, default=DEFAULT_URL, help='URL of the streaming Youtube video')
     parser.add_argument('--conf', type=float, default=CONF_THRESHOLD, help='Confidence threshold')
     parser.add_argument('--mask', type=str, default='src/assets/images/mask-default.png', help='Path to the mask')
     parser.add_argument('--verbose', action='store_true', help='Whether to print the output or not')
@@ -36,6 +35,8 @@ def parse_opt():
 
 def validate_parse(opt):
     if not os.path.exists(opt.weights):
+        if opt.weights == WEIGHTS_PATH:
+            model = YOLO(opt.weights)
         loggingInfo(f'Path {opt.weights} does not exist')
         raise ValueError(f'Path {opt.weights} does not exist')
     if not os.path.exists(opt.path) and not opt.stream:
