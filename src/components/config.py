@@ -11,7 +11,6 @@ LINE_BEGIN = {
     'car': [],
 }
 
-CLASSES = ['car', 'truck', 'bus', 'motorcycle']
 CONF_THRESHOLD = 0.5
 WEIGHTS_PATH = f'yolov8/weights/yolov8l.pt'
 DEFAULT_URL = 'https://www.youtube.com/watch?v=Jsn8D3aC840&list=PL1FZnkj4ad1PFJTjW4mWpHZhzgJinkNV0&index=17'

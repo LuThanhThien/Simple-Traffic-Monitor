@@ -1,6 +1,6 @@
-path: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\plate_data
+path: D:\code\Simple-Traffic-Monitor\src\assets\data\plate_data
 train: train/images
-val: valid/images
+val: val/images
 test: test/images
 
 nc: 1

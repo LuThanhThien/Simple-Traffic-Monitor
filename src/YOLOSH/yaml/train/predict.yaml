@@ -1,5 +1,5 @@
-input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\annotated_plate_data
+input: D:\code\Simple-Traffic-Monitor\src\assets\data\annotated_plate_data
 
-output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\annotated_plate_data
+output: D:\code\Simple-Traffic-Monitor\src\assets\data\annotated_plate_data
 
 classes: ['license plate']

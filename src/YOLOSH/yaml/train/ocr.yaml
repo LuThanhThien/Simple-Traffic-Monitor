@@ -1,4 +1,4 @@
-path: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\ocr_data
+path: D:\code\Simple-Traffic-Monitor\src\assets\data\ocr_data
 train: train/images
 val: val/images
 test: test/images

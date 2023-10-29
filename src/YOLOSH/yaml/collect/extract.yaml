@@ -1,6 +1,6 @@
 # all videos must be in the same path
 # path to videos
-path: C:\Users\USER\Projects\20231019-traffic-management\src\assets
+path: D:\code\Simple-Traffic-Monitor\src\assets
 
 # name for vidoes in path
 videos:
@@ -18,4 +18,4 @@ videos:
 # must be urls to YOUTUBE video
 urls: 
 
-output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\VLPA\data\raw-plate-images
+output: D:\code\Simple-Traffic-Monitor\src\assets\VLPA\data\raw-plate-images
