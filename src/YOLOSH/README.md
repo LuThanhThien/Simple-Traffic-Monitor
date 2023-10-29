@@ -1,6 +1,6 @@
-YOLOSH - a YOLO Simple Helper 
+# YOLOSH - a YOLO Simple Helper 
 
-# problem with youtube_dl:
+## problem with youtube_dl:
 lib\site-packages\youtube_dl\extractor\common.py", line 534
 
 'uploader_id': self._search_regex(r'/(?:channel|user)/([^/?&#]+)', owner_profile_url, 'uploader id') if owner_profile_url else None,
