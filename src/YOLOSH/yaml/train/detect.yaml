@@ -1,0 +1,9 @@
+path: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\plate_data
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 1
+names:
+  0: license plate
+
