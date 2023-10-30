@@ -42,6 +42,7 @@ def parse_opt():
         parser.add_argument('--epochs', type=int, default=3, help='Number of epochs')
         parser.add_argument('--imgsz', type=int, default=640, help='Image size')
         parser.add_argument('--workers', type=int, default=1, help='Number of loader workers')
+        parser.add_argument('--resume', action='store_true', help='Resume the training process by a pretrained weights')
         parser.add_argument('--project', type=str, default='runs', help='Path of project') 
         parser.add_argument('--name', type=str, default='detect', help='Name of project') 
 
