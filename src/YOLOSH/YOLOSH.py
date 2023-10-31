@@ -45,6 +45,7 @@ def parse_opt():
         parser.add_argument('--resume', action='store_true', help='Resume the training process by a pretrained weights')
         parser.add_argument('--project', type=str, default='runs', help='Path of project') 
         parser.add_argument('--name', type=str, default='detect', help='Name of project') 
+        
 
         # Predictor settings
         parser.add_argument('--weightsPred', type=str, default='yolov8l.pt', help='Path of YOLO model weights')

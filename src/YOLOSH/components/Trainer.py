@@ -16,7 +16,8 @@ class Trainer:
             model = YOLO(self.opt.weightsTrain)
             print("Training start >>>")
             result = model.train(data=self.opt.dataTrain, batch=self.opt.batch, epochs=self.opt.epochs, resume=self.opt.resume,
-                                workers=self.opt.workers, imgsz=self.opt.imgsz, project=self.opt.project, name=self.opt.name)
+                                workers=self.opt.workers, imgsz=self.opt.imgsz, project=self.opt.project, name=self.opt.name,
+                                degrees=180)
         except Exception as e:
             raise e
 
