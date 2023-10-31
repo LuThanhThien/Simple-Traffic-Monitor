@@ -44,7 +44,8 @@ def parse_opt():
         parser.add_argument('--workers', type=int, default=1, help='Number of loader workers')
         parser.add_argument('--resume', action='store_true', help='Resume the training process by a pretrained weights')
         parser.add_argument('--project', type=str, default='runs', help='Path of project') 
-        parser.add_argument('--name', type=str, default='detect', help='Name of project') 
+        parser.add_argument('--name', type=str, default='detect', help='Name of project')   
+        parser.add_argument('--shutdown', action='store_true', help='WARNING: Shut down your local machine when finish traing')
         
 
         # Predictor settings

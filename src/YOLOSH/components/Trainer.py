@@ -3,7 +3,10 @@ import torch
 import time
 from tqdm import tqdm
 import os
+import ctypes
 import glob
+from src.logger import logging
+from src.utils import loggingInfo
 from ultralytics.yolo.data.utils import IMG_FORMATS, VID_FORMATS
 from components.utils import yaml_to_dict
 
@@ -13,11 +16,21 @@ class Trainer:
 
     def train(self):
         try:
+            start = time.time()
             model = YOLO(self.opt.weightsTrain)
-            print("Training start >>>")
+            loggingInfo("Training start >>>")
             result = model.train(data=self.opt.dataTrain, batch=self.opt.batch, epochs=self.opt.epochs, resume=self.opt.resume,
                                 workers=self.opt.workers, imgsz=self.opt.imgsz, project=self.opt.project, name=self.opt.name,
-                                degrees=180)
+                                degrees=60, flipud=0, fliplr=0, shear=30)
+            end = time.time()
+            loggingInfo('Finish training in ', end-start, ' seconds')
+
+            if self.opt.shutdown:
+                loggingInfo('WARNING: Finished training. Do you still want to shut down? After 5 minutes shut down will be automatically implemented')
+                ctypes.windll.user32.MessageBoxW(0, "Finished training. Do you still want to shut down? After 5 minutes shut down will be automatically implemented", "Warning", 1)
+                # Wait for 5 minutes
+                time.sleep(300) 
+                os.system('shutdown -s')
         except Exception as e:
             raise e
 
