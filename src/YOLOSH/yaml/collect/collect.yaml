@@ -1,0 +1,19 @@
+# all videos must be in the same path
+# path to videos
+path: ..\assets\videos
+
+# name for vidoes in path
+videos:
+  - video-0.mp4
+  - video-1.mp4
+  - video-2.mp4
+  - video-3.webm
+  - video-4.webm
+  - video-5.mp4
+  - video-6.mp4
+
+
+# must be urls to YOUTUBE video
+urls: 
+
+output: ..\assets\VLPA\data\raw-plate-images

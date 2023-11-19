@@ -1,0 +1,10 @@
+urls:
+  # - https://www.youtube.com/watch?v=pAuSrVYUufA
+  # - https://www.youtube.com/watch?v=1rj8G94LCg4
+  # - https://www.youtube.com/watch?v=wy9G6YVu9hw
+  # - https://www.youtube.com/watch?v=fm0cX7P6PSw&t=13s
+  # - https://www.youtube.com/watch?v=V8paX22Sgzg
+  # - https://www.youtube.com/watch?v=AFHGVQKH6Fc
+  # - https://www.youtube.com/watch?v=a9JyKLG8Agc
+
+output: ..\assets\videos
