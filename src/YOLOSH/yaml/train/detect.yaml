@@ -1,19 +1,11 @@
-path: ..\..\assets\data\plate_data
+path: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\plate_data
 train: train/images
 val: val/images
 test: test/images
 
 names:
-  0: person
-  1: bicycle
-  2: car
-  3: motorcycle
-  4: bus
-  5: train
-  6: truck
-  7: traffic light
-  8: stop sign
-  9: license plate
+  0: license plate
+
 
 # names:
 #   0: person

@@ -6,7 +6,7 @@ import os
 import ctypes
 import glob
 from src.logger import logging
-from src.modules.utils import loggingInfo
+from src.util.utils import loggingInfo
 from ultralytics.yolo.data.utils import IMG_FORMATS, VID_FORMATS
 from components.utils import yaml_to_dict
 
@@ -197,3 +197,4 @@ class Predictor:
 
     def main(self):
         self.predict()
+

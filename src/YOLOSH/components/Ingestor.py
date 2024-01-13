@@ -7,7 +7,7 @@ from components.utils import yaml_to_dict
 from ultralytics.yolo.data.utils import IMG_FORMATS
 
 class Ingestor:
-    def __init__(self, opt) -> None:
+    def __init__(self, opt = None) -> None:
         print("Validating input arguments...")
         self.validate_opt(opt)
         self.opt = opt
@@ -15,8 +15,8 @@ class Ingestor:
         print("Input arguments passed validation.\n")
 
         print(f"Validating yaml file {opt.dataIngest}")
-        self.ingestor_yaml_arg = ['input', 'output']
-        self.input, self.output = self.validate_yaml(opt.dataIngest)
+        self.ingestor_yaml_arg = ['input', 'output', 'relabel']
+        self.input, self.output, self.relabel_dict = self.validate_yaml(opt.dataIngest)
         time.sleep(1)
         print("Yaml file passed validation.\n")
 
@@ -36,7 +36,7 @@ class Ingestor:
             raise FileNotFoundError(f"Yaml file {self.opt.dataIngest} does not exist.")
         if opt.ratio <= 0:
             raise ValueError("ratio must be greater than 0.")
-        if opt.mode not in ['split', 'merge']:
+        if opt.mode not in ['split', 'merge', 'relabel']:
             raise ValueError("mode must be either 'split' or 'merge'.")
         if opt.method not in ['copy', 'cut']:
             raise ValueError("method must be either 'copy' or 'cut'.")
@@ -57,13 +57,24 @@ class Ingestor:
             raise KeyError('No input path specified in yaml file.')
         input = data['input']
 
+
+        relabel = {}
+        if 'relabel' in data.keys():
+            if 'path' not in data['relabel'].keys():
+                raise KeyError('No path specified in relabel.')
+            if 'old' not in data['relabel'].keys():
+                raise KeyError('No old specified in relabel.')
+            if 'new' not in data['relabel'].keys():
+                raise KeyError('No new specified in relabel.')
+            relabel = data['relabel']
+
         if len(data.keys()) > len(self.ingestor_yaml_arg):
             print(f"""WARNING: Yaml file contains more than {len(self.ingestor_yaml_arg)} keys. 
                   Splitter class keys are {self.ingestor_yaml_arg}. 
                   Some keys not recognized in this class will be automatically excluded.""")
             time.sleep(2)
-
-        return input, output    
+        
+        return input, output, relabel
     
 
     def transfer(self, input, output, file, label_file):
@@ -155,7 +166,7 @@ class Ingestor:
         
         # Move images and labels to corresponding directories
         for folder in os.listdir(self.input):
-            if os.path.isdir(os.path.join(self.input, folder)):
+            if os.path.isdir(os.path.join(self.input, folder)): 
                 os.makedirs(os.path.join(self.output, folder, 'images'), exist_ok=True)
                 os.makedirs(os.path.join(self.output, folder, 'labels'), exist_ok=True)
                 
@@ -172,8 +183,42 @@ class Ingestor:
         if self.blank > 0:
             print(f'Ignored {self.blank} blank label files.')
 
+
+    def mapping(self):
+        mapping = {}
+        new_dict = {}
+        for key, value in self.relabel_dict['new'].items():
+            new_dict[str(value)] = key
+        for key, value in self.relabel_dict['old'].items():
+            mapping[str(key)] = str(new_dict[value])
+        return mapping
+    
+    def relabel_process(self, text_dir, mapping):
+        with tqdm(total=len(os.listdir(text_dir)), position=0, leave=True) as pbar:
+            for i, file in enumerate(os.listdir(text_dir)):
+                pbar.set_description_str(f'Relabeling file: {file}')
+                if file.endswith('.txt'):
+                    new_lines = []
+                    with open(os.path.join(text_dir, file), 'r') as f:
+                        for line in f:
+                            new_lines.append(mapping[line.split()[0]] + ' ' + ' '.join(line.split()[1:]) + '\n')
+                    with open(os.path.join(text_dir, file), 'w') as f:
+                        f.writelines(new_lines)
+                        pbar.update()  
+
+    def relabel(self):
+        mapping = self.mapping()
+        for label_folder in self.relabel_dict['path']:
+            text_dir = os.path.join(self.relabel_dict['input'], label_folder)
+            print('Relabeling files in ', text_dir)
+            self.relabel_process(text_dir, mapping)
+
+
     def main(self):
         if self.mode == 'split':
             self.split()
         elif self.mode == 'merge':
             self.merge()
+        elif self.mode == 'relabel':
+            self.relabel()
+

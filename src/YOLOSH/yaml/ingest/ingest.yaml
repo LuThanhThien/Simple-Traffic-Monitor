@@ -1,2 +1,10 @@
-input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\ocr_data_aug
-output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\ocr_data
+input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\vehicle_data\images
+output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\vehicle_data
+
+relabel:
+  input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\Plate_data
+  path: ['labels']
+  old:
+    0: license plate
+  new:
+    5: license plate
