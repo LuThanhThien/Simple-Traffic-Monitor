@@ -47,13 +47,14 @@ class Predictor:
         self.weightsPred = opt.weightsPred
         self.model = YOLO(self.weightsPred)
 
-
+        self.map_dict = {}    
         print(f"Validating yaml file {opt.dataPred}")
         self.pred_yaml_arg = ['input', 'output', 'classes']
         self.input, self.output, self.class_dict = self.validate_yaml(opt.dataPred)
         time.sleep(1)
         print("Yaml file passed validation.\n")
-        
+
+            
         self.includeImg = opt.includeImg
         self.includeVid = opt.includeVid
         self.ext = []
@@ -62,7 +63,7 @@ class Predictor:
 
         self.conf = opt.conf
         self.save = opt.save
-        self.save_train = opt.save_train
+        self.save_txt = opt.save_txt
         self.annotate = opt.annotate
 
 
@@ -99,31 +100,36 @@ class Predictor:
             time.sleep(1)
 
         # check for classes
-        class_keys = []
-        if data['classes'] is None or data['classes'] == []:
+        exclude = {}
+        if data['classes'] is None or data['classes'] == {}:
             print("WARNING: Classes is empty, automatic assigning all model classes.")
             data['classes'] = self.model.names
-            class_keys = list(self.model.names.keys())
             time.sleep(1)
         else:
-            exclude = []
             all_classes = list(self.model.names.values())
-            for cls in data['classes']:
+            for key, cls in data['classes'].items():
                 if cls not in all_classes:
-                    exclude.append(cls)
-                    data['classes'].remove(cls)
-                else:
-                    class_keys.append(all_classes.index(cls))
+                    exclude[key] = cls
         
         if len(exclude) > 0:
-            print(f"WARNING: The following classes are not in the model will be excluded: {exclude}")
+            for key, cls in exclude.items():
+                data['classes'].pop(key)
+            print(f"WARNING: The following classes are not in the model will be excluded: {list(exclude.values())}")
             time.sleep(1)
 
+        if self.opt.map_cls:
+            reverse_dict = {v: k for k, v in data['classes'].items()}
+            for key, cls in self.model.names.items():
+                if cls in reverse_dict.keys():
+                    self.map_dict[key] = reverse_dict[cls]
+            print(f"Mapping classes to {self.map_dict}")
+            time.sleep(1)
+        
         input = data['input']
         output = data['output']
-        classes = data['classes']
-
-        return input, output, dict(zip(class_keys, classes))
+        class_dict = data['classes']
+        
+        return input, output, class_dict
 
     def find_media(self, path_list:list=[], root=None):        
         for root, dirs, files in os.walk(root):
@@ -142,19 +148,62 @@ class Predictor:
             os.makedirs(os.path.join(self.output, 'labels'), exist_ok=True)
         
         classes_txt_path = os.path.join(self.output, 'labels', 'classes.txt')
-        with open(classes_txt_path, 'w') as f:
+        with open(classes_txt_path, 'a') as f:
             for cls in self.class_dict.values():
-                f.write(cls+'\n')
+                f.write(str(cls)+'\n')
 
         predefined_classes_path = 'labelImg\\data\\predefined_classes.txt'
+        os.makedirs(os.path.dirname(predefined_classes_path), exist_ok=True)
         open(predefined_classes_path, 'w').close()
         with open(predefined_classes_path, 'w') as f:
             for cls in self.class_dict.values():
-                f.write(cls+'\n')
+                f.write(str(cls)+'\n')
+    
+    def check_same_txt_path(self):
+        # check if path is the same as output path
+        if os.path.dirname(self.input) == self.output:
+            return True
+        else:
+            return False
         
 
-    def predict(self):
+    def save_txt_file(self, path, predictions):
+        # saving txt file
+        if self.check_same_txt_path():
+            raise ValueError("Input path and output path cannot be the same. This leading to overwriting the original txt file. Please change the output path.")
+        txt_path = os.path.join(self.output, 'labels', os.path.basename(path).replace(os.path.splitext(path)[1], '.txt'))
+        with open(txt_path, 'a') as f:
+            for cls, box in zip(predictions.cls, predictions.xywhn):
+                if int(cls) not in self.map_dict.keys():
+                    continue
+                pred_key = cls if not self.opt.map_cls else self.map_dict[int(cls)]
+                f.write(f"{pred_key} {box[0]} {box[1]} {box[2]} {box[3]}\n")
 
+    def save_semi_txt_file(self, path, txt_lines):
+        if self.check_same_txt_path():
+            raise ValueError("Input path and output path cannot be the same. This leading to overwriting the original txt file. Please change the output path.")
+        # saving txt file, path is the image path
+        txt_name = os.path.basename(path).replace(os.path.splitext(path)[1], '.txt')
+        txt_path = os.path.join(self.output, 'labels', txt_name)
+        self.writelines_without_duplicate(txt_path, txt_lines)
+
+    @staticmethod
+    def writelines_without_duplicate(txt_path, txt_lines):
+        if os.path.exists(txt_path):
+            # saving txt file, path is the image path
+            with open(txt_path, 'r+') as f:
+                real_lines = f.readlines()
+            with open(txt_path, 'a+') as f:
+                for line in txt_lines:
+                    if line not in real_lines:
+                        print('writing line: ', line)
+                        f.write(line)
+        else:
+            with open(txt_path, 'w+') as f:
+                f.writelines(txt_lines) 
+
+    def predict(self):
+        import os 
         print('Input path: ', self.input)
         print('Output path: ', self.output)
         print('Weights path: ', self.weightsPred)
@@ -171,30 +220,115 @@ class Predictor:
         project = os.path.dirname(self.output)
         name = os.path.basename(self.output)
 
-        print('Making up classes txt files.')
-        if self.save_train:
+        
+        if self.save_txt:
+            print('Making up classes txt files.')
             self.make_up_classes_txt()
-            
-        path_list_tqdm = tqdm(path_list, position=0)
-        for path in path_list_tqdm:
-            path_list_tqdm.set_description_str(f"Processing {os.path.basename(path)}" )
-            predictions = self.model.predict(
-                path,
-                save=self.save,
-                save_txt=self.save_train,
-                conf=self.conf,
-                project=project,
-                name=name,
-                exist_ok=True,
-                classes=list(self.class_dict.keys())
-            )
+
+        with tqdm(total=len(path_list), position=0, leave=True) as pbar:
+            for path in path_list:
+                pbar.set_description_str(f"Processing {os.path.basename(path)}" )
+                predictions = self.model.predict(
+                    path,
+                    save=self.save,
+                    save_txt=None,
+                    conf=self.conf,
+                    project=project,
+                    name=name,
+                    exist_ok=True,
+                    classes=list(self.class_dict.keys())
+                )
+
+                if self.save_txt:
+                    self.save_txt_file(path, predictions[0].boxes)
+                
+                pbar.update()  
 
         if self.annotate:
             print("Opening labelImg...")
             import os
-            os.system(f"cd labelImg && python labelImg.py {self.input} {os.path.join(self.output, 'labels', 'classes.txt')} ")
+            os.system(f"labelImg")
+        return
+
+    def semi_predict(self):
+        import os 
+        
+        print('Input path: ', self.input)
+        print('Output path: ', self.output)
+        print('Weights path: ', self.weightsPred)
+        print('Classes included: ', self.class_dict.values())
+        print('Include image: ', self.includeImg)
+        print('Include video: ', self.includeVid)
+        print('Yaml file path: ', self.opt.dataPred)
+        
+
+        print("Finding media files and predict >>>")
+        path_list = self.find_media(root=self.input)
+        print('Found {} media files.'   .format(len(path_list)))
+
+        project = os.path.dirname(self.output)
+        name = os.path.basename(self.output)
+
+        
+        if self.save_txt:
+            print('Making up classes txt files.')
+            self.make_up_classes_txt()
+
+        num_transfer = 0
+        num_predict = 0 
+        with tqdm(total=len(path_list), position=0, leave=True) as pbar:
+            for path in path_list:
+                txt_name = os.path.basename(path).replace(os.path.splitext(path)[1], '.txt')
+                txt_path = os.path.join(os.path.dirname(os.path.dirname(path)), 'labels', txt_name)
+                class_set = set()
+                txt_lines = []
+                if os.path.exists(txt_path):
+                    with open(txt_path, 'r') as f:
+                        txt_lines = f.readlines()
+                        for line in txt_lines:
+                            class_set.add(int(line.split()[0]))
+                # print(class_set)
+                # print(txt_lines)
+                if not any(element in class_set for element in self.map_dict.values()):
+                    pbar.set_description_str(f"Predicting {os.path.basename(path)}" )
+                    predictions = self.model.predict(
+                        path,
+                        save=self.save,
+                        save_txt=None,
+                        conf=self.conf,
+                        project=project,
+                        name=name,
+                        exist_ok=True,
+                        classes=list(self.class_dict.keys())
+                    )
+                    if self.save_txt:
+                        self.save_semi_txt_file(txt_path, txt_lines)
+                        self.save_txt_file(path, predictions[0].boxes)
+                    num_predict += 1
+                else:
+                    # copy to output folder
+                    pbar.set_description_str(f"Transfering {os.path.basename(path)}" )
+                    if self.save_txt:
+                        self.save_semi_txt_file(txt_path, txt_lines)
+                    num_transfer += 1
+                pbar.update()  
+
+        print(f"Predicted {num_predict} images and transfered {num_transfer} images.")
+                                
+        if self.annotate:
+            print("Opening labelImg...")
+            import os
+            os.system(f"labelImg")
         return
 
     def main(self):
-        self.predict()
+        if self.opt.semi:
+            self.semi_predict()
+        else:
+            self.predict()
 
+
+# python -m YOLOSH --className Predictor --save_txt --includeImg --annotate --weightsPred C:\Users\USER\Projects\20231019-traffic-management\src\assets\weights\yolov8\weights\yolov8l.pt --dataPred C:\Users\USER\Projects\20231019-traffic-management\src\YOLOSH\yaml\train\predict.yaml --map_cls
+# python -m YOLOSH --className Predictor --save_txt --includeImg --annotate --weightsPred C:\Users\USER\Projects\20231019-traffic-management\src\YOLOSH\runs\yoloplate-v1l\weights\best.pt --dataPred C:\Users\USER\Projects\20231019-traffic-management\src\YOLOSH\yaml\train\predict.yaml --map_cls
+        
+        

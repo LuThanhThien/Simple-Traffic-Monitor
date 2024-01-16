@@ -20,9 +20,9 @@ def parse_opt():
     def list_of_strings(arg):
         return arg.split(',')
 
-    parser.add_argument('--weights', type=str, default=WEIGHTS_PATH, help='Path to the object detection model')
+    parser.add_argument('--weights', type=str, default=VEHICLE_WEIGHTS, help='Path to the object detection model')
     parser.add_argument('--classes', type=list_of_strings, default=CLASSES, help='Classes for detection')
-    parser.add_argument('--path', type=str, default='src//assets/videos//test-4.mp4', help='Path to the video')
+    parser.add_argument('--path', type=str, default=r'src\assets\videos\test_02.mp4', help='Path to the video')
     parser.add_argument('--stream', action='store_true', help='Whether to stream from Youtube or not')
     parser.add_argument('--url', type=str, default=DEFAULT_URL, help='URL of the streaming Youtube video')
     parser.add_argument('--mask', type=str, default='src/assets/images/mask-default.png', help='Path to the mask')
@@ -100,6 +100,7 @@ def main():
     loggingInfo('Initializing objects...')
     vehicleObj = UltraDetector(model=model_vehicle, classes=opt.classes)
     plateObj = UltraDetector(model=model_plate)
+    detector = UltraDetector(model=YOLO(WEIGHTS_PATH))
 
     print('\n<<Monitor summary>>')
     if opt.stream: 
@@ -119,10 +120,13 @@ def main():
         if not ret:
             break
         
-        # Pipeline   
+        # detection pipeline   
+        # detector.Detect(frame, mask, tracker="botsort.yaml")
+        # union_node = detector.frame_nodes
+        # union_node.summarize()
         vehicleObj.Detect(frame, mask, tracker="botsort.yaml")
         plateObj.Detect(frame, tracker="botsort.yaml")
-        union_node = vehicleObj.frame_nodes.deepunion(plateObj.frame_nodes)
+        union_node = vehicleObj.frame_nodes.deepunion(plateObj.frame_nodes, conf_threshold=0.9)
         union_node.summarize()
 
         # Name and resize

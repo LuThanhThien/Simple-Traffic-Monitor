@@ -1,5 +1,5 @@
-input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\vehicle_data\images
-output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\vehicle_data
+input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\car-plate-paddle\blurred
+output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\car-plate-paddle
 
 relabel:
   input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\raw_data-quan\Plate_data

@@ -17,7 +17,7 @@ def parse_opt():
         extract_yaml = os.path.join(yolosh_dir, 'yaml//collect//extract.yaml')
         download_yaml = os.path.join(yolosh_dir, 'yaml//collect//download.yaml')
         ingest_yaml = os.path.join(yolosh_dir, 'yaml//ingest//ingest.yaml')
-        train_yaml = os.path.join(yolosh_dir, 'yaml//train//train.yaml')
+        train_yaml = os.path.join(yolosh_dir, 'yaml//train//detect.yaml')
         predict_yaml = os.path.join(yolosh_dir, 'yaml//train//predict.yaml')
 
         # Collector settings
@@ -55,14 +55,29 @@ def parse_opt():
         parser.add_argument('--includeVid', action='store_true', help='To include video in prediction')
         parser.add_argument('--conf', type=float, default=0.5, help='Confidence threshold')
         parser.add_argument('--save', action='store_true', help='To save image with result')
-        parser.add_argument('--save_train', action='store_true', help='To save the result in YOLO trainable .txt file')
+        parser.add_argument('--save_txt', action='store_true', help='To save the result in YOLO trainable .txt file')
         parser.add_argument('--annotate', action='store_true', help='To open annotate tool labelImg or not after prediction')
+        parser.add_argument('--map_cls', action='store_true', help='To open annotate tool labelImg or not after prediction')
+        parser.add_argument('--semi', action='store_true', help='Semi-prediction from available labels')
+
 
         return parser.parse_args()
 
 
+def main2():
+    data_path = r'C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\ocr_data'
+    test = os.path.join(data_path, 'test')
+    train = os.path.join(data_path, 'train')
+    valid = os.path.join(data_path, 'valid')
+    for path in [test, train, valid]:
+        for folder in [os.path.join(path,'images'), os.path.join(path,'labels')]:
+            for file in os.listdir(folder):
+                if file.split('.')[0].endswith('bitwise') or file.split('.')[0].endswith('blur'):
+                    file_path = os.path.join(folder, file)
+                    os.remove(file_path)
+          
 if __name__ == "__main__":
-
+    # main2()
     opt = parse_opt()
     class_name_str = opt.className
 

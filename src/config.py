@@ -1,5 +1,5 @@
 from ultralytics import YOLO
-from src.modules.utils import *
+from src.util.utils import *
 import os
 import re
 import os
@@ -39,7 +39,7 @@ CONRECT_COLORC = (0, 255, 0)
 CLASSES = [1, 2, 3, 5, 7]
 FOCUS_CLASSES = [2, 3, 5, 7]
 CONF_THRESHOLD = 0.5
-WEIGHTS_PATH = f'yolov8/weights/yolov8m.pt'
+VEHICLE_WEIGHTS = rf"src/assets/weights/yolov8/weights/yolov8m.pt"
 DEFAULT_URL = 'https://www.youtube.com/watch?v=Jsn8D3aC840&list=PL1FZnkj4ad1PFJTjW4mWpHZhzgJinkNV0&index=17'
 
 # plate detection
@@ -49,6 +49,7 @@ lastest_plate, next_ocr = latest_version_file(weight_path, name='yoloplate-v')
 
 PLATE_WEIGHTS = os.path.join(weight_path, lastest_plate, 'weights', 'best.pt')
 OCR_WEIGHTS = os.path.join(weight_path, lastest_ocr, 'weights', 'best.pt')
+WEIGHTS_PATH  = rf"src\assets\weights\vehicle_detect\vehicle-v1n\vehicle-v1n\weights\best.pt"
 
 
 CHAR2INT = {

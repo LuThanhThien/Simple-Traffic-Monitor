@@ -18,7 +18,7 @@ class FrameTree(Detections):
         self.nodes:List['FrameTree'] = []
         
 
-    # get root's components and properties
+    # get root's components and properxties
     def getRoot(self) -> np.ndarray:
         return self.root
     
@@ -32,7 +32,7 @@ class FrameTree(Detections):
     
     def getId(self) -> int:
         return self.id
-        
+    
     def getNodes(self) -> List['FrameTree']:
         return self.nodes
     
@@ -284,9 +284,9 @@ class FrameTree(Detections):
         self.nodes.extend(node2.nodes)
         self.concat(node2)
 
-    def deepunion(self, frame_nodes:'FrameTree', conf_threshold=0.3, deepcopy=True) -> 'FrameTree':
+    def deepunion(self, frame_nodes:'FrameTree', conf_threshold=0.5, deepcopy=True) -> 'FrameTree':
         """
-        withtin the common node, union two trees and detect their corresponding relationship
+        within the common node, union two trees and detect their corresponding relationship
         """
         if not self.is_same_root(frame_nodes):
             raise Exception('Cannot concat trees with different roots')

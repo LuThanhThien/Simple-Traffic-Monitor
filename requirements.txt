@@ -44,4 +44,18 @@ lxml
 ## for custom package YOLOT
 pytube
 
+## Text Zoom
+pyodbc
+paddlepaddle-gpu
+paddlepaddle
+common # for paddle package
+dual
+tight
+data
+prox
+
+rapidfuzz
+visualdl
+
+
 -e .

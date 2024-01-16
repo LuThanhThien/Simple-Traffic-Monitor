@@ -1,5 +1,10 @@
-input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\samples
+input: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\vehicle_data_large\test\images
 
-output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\samples
+output: C:\Users\USER\Projects\20231019-traffic-management\src\assets\data\vehicle_data_large\semi-labels\test
 
-classes: []
+classes: 
+  0: bus
+  1: car
+  2: motorcycle
+  3: truck
+  4: license plate

@@ -12,7 +12,9 @@ from src.frame.Cascades import FrameTree
 
 
 class UltraDetector:
-    def __init__(self, model:Model, classes:List[int]=[], conf_threshold:float=0.5) -> None:
+    def __init__(self, model:Model, 
+                 classes:List[int]=[], 
+                 conf_threshold:float=0.5) -> None:
         # parameters
         start = time.time()
         dict_name:dict = model.names
@@ -22,7 +24,7 @@ class UltraDetector:
         else:      
             self.classes = classes
         self.conf_threshold = conf_threshold
-
+        
         # model
         self.model = model
 
